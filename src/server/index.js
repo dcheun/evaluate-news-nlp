@@ -4,7 +4,7 @@ const textapi = {
   application_key: process.env.API_KEY,
 };
 // Port server will run on
-const PORT = 8082;
+const PORT = process.env.PORT || 8082;
 
 const path = require("path");
 const express = require("express");
@@ -22,6 +22,6 @@ app.get("/key", (req, res) => {
 });
 
 // designates what port the app will listen to for incoming requests
-app.listen(process.env.PORT || PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server started on localhost port ${PORT}`);
 });

@@ -10,7 +10,7 @@ function handleSubmit(event) {
     return false;
   }
 
-  getData("http://localhost:8082/key")
+  getData("./key")
     .then((textapi) => {
       const reqURL = `${BASE_URL}${textapi.application_key}&url=${formText}`;
       return fetch(reqURL);
