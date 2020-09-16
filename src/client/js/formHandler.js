@@ -10,20 +10,13 @@ function handleSubmit(event) {
     return false;
   }
 
-  console.log("::: Form Submitted :::");
   getData("http://localhost:8082/key")
     .then((textapi) => {
-      console.log("key=", textapi);
       const reqURL = `${BASE_URL}${textapi.application_key}&url=${formText}`;
-      console.log(reqURL);
       return fetch(reqURL);
     })
+    .then((res) => res.json())
     .then((res) => {
-      console.log(res);
-      return res.json();
-    })
-    .then((res) => {
-      console.log(res);
       const results = document.getElementById("results");
       const formattedResults = [];
       formattedResults.push(
