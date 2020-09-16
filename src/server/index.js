@@ -22,6 +22,6 @@ app.get("/key", (req, res) => {
 });
 
 // designates what port the app will listen to for incoming requests
-app.listen(PORT, () => {
+app.listen(process.env.PORT || PORT, () => {
   console.log(`Server started on localhost port ${PORT}`);
 });
