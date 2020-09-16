@@ -12,6 +12,7 @@ module.exports = {
     minimizer: [new TerserPlugin({}), new OptimizeCssAssetsPlugin({})],
   },
   output: {
+    filename: "[name].[contenthash].js",
     libraryTarget: "var",
     library: "Client",
   },

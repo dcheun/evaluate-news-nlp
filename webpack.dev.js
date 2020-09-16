@@ -9,6 +9,7 @@ module.exports = {
   devtool: "source-map",
   stats: "verbose",
   output: {
+    filename: "[name].[contenthash].js",
     libraryTarget: "var",
     library: "Client",
   },
