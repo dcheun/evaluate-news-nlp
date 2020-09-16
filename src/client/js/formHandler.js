@@ -11,19 +11,6 @@ function handleSubmit(event) {
   }
 
   console.log("::: Form Submitted :::");
-  // fetch("http://localhost:8082/meaningCloud", {
-  //   method: "POST",
-  //   credentials: "same-origin",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({ url: formText }),
-  // })
-  //   .then((res) => res.json())
-  //   .then((res) => {
-  //     document.getElementById("results").innerHTML = res;
-  //   });
-
   getData("http://localhost:8082/key")
     .then((textapi) => {
       console.log("key=", textapi);

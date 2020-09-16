@@ -29,18 +29,6 @@ app.get("/test", function (req, res) {
   res.send(mockAPIResponse);
 });
 
-app.post("/meaningCloud", (req, res) => {
-  const url = req.body.url;
-  meaningCloudAPI(url)
-    .then((apiRes) => apiRes.json())
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((error) => {
-      console.log("server:post:meaningCloud:error", error);
-    });
-});
-
 // designates what port the app will listen to for incoming requests
 app.listen(PORT, () => {
   console.log(`Server started on localhost port ${PORT}`);
