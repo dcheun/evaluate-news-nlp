@@ -1,6 +1,3 @@
-const BASE_URL =
-  "https://api.meaningcloud.com/sentiment-2.1?of=json&lang=auto&key=";
-
 function handleSubmit(event) {
   event.preventDefault();
 
@@ -10,17 +7,30 @@ function handleSubmit(event) {
     return false;
   }
 
-  getData("./key")
-    .then((textapi) => {
-      const reqURL = `${BASE_URL}${textapi.application_key}&url=${formText}`;
-      return fetch(reqURL);
-    })
-    .then((res) => res.json())
-    .then((res) => {
-      const results = document.getElementById("results");
-      const formattedResults = [];
-      formattedResults.push(
-        `<table class="global-table">
+  const data = { url: formText };
+
+  postData("http://localhost:8082/meaningCloud", data).then((res) => {
+    renderResults(res);
+  });
+}
+
+function renderResults(results) {
+  document.getElementById("results").innerHTML = `${resultsTemplate(results)}`;
+}
+
+function resultsTemplate(data) {
+  if (data && Object.keys(data).length > 3) {
+    const {
+      model,
+      score_tag,
+      agreement,
+      subjectivity,
+      confidence,
+      irony,
+    } = data;
+    const htmlTemplate = [];
+    htmlTemplate.push(
+      `<table class="global-table">
         <tr>
           <th>Level</th>
           <th>Model</th>
@@ -32,59 +42,70 @@ function handleSubmit(event) {
         </tr>
         <tr>
           <td>Global</td>
-          <td>${res.model}</td>
-          <td>${res.score_tag}</td>
-          <td>${res.agreement}</td>
-          <td>${res.subjectivity}</td>
-          <td>${res.confidence}</td>
-          <td>${res.irony}</td>
+          <td>${model}</td>
+          <td>${score_tag}</td>
+          <td>${agreement}</td>
+          <td>${subjectivity}</td>
+          <td>${confidence}</td>
+          <td>${irony}</td>
         </tr>
-      </table>`,
-        `<table class="sentence-table">
-        <tr>
-          <th>Level</th>
-          <th>Text</th>
-          <th>Score Tag</th>
-          <th>Agreement</th>
-          <th>Confidence</th>
-        </tr>
-      `
-      );
+      </table>`
+    );
 
-      for (let sentence of res.sentence_list) {
-        formattedResults.push(`<tr>
-          <td>Sentence</td>
-          <td>${sentence.text}</td>
-          <td>${sentence.score_tag}</td>
-          <td>${sentence.agreement}</td>
-          <td>${sentence.confidence}</td>
-        </tr>`);
-        for (let segment of sentence.segment_list) {
-          formattedResults.push(`<tr>
-            <td>Segment</td>
-            <td>${segment.text}</td>
-            <td>${segment.score_tag}</td>
-            <td>${segment.agreement}</td>
-            <td>${segment.confidence}</td>
+    if (data.sentence_list.length > 0) {
+      htmlTemplate.push(`
+        <table class="sentence-table">
+          <tr>
+            <th>Level</th>
+            <th>Text</th>
+            <th>Score Tag</th>
+            <th>Agreement</th>
+            <th>Confidence</th>
+          </tr>
+      `);
+
+      for (let sentence of data.sentence_list) {
+        htmlTemplate.push(`<tr>
+            <td>Sentence</td>
+            <td>${sentence.text}</td>
+            <td>${sentence.score_tag}</td>
+            <td>${sentence.agreement}</td>
+            <td>${sentence.confidence}</td>
           </tr>`);
+        for (let segment of sentence.segment_list) {
+          htmlTemplate.push(`<tr>
+              <td>Segment</td>
+              <td>${segment.text}</td>
+              <td>${segment.score_tag}</td>
+              <td>${segment.agreement}</td>
+              <td>${segment.confidence}</td>
+            </tr>`);
         }
       }
 
-      formattedResults.push(`</table>`);
+      htmlTemplate.push(`</table>`);
+    }
 
-      results.innerHTML = formattedResults.join("");
-      const rawResults = `
+    const rawResults = `
       <p>Full Raw Results:</p>
-      <pre>${JSON.stringify(res, null, 2)}</pre>
+      <pre>${JSON.stringify(data, null, 2)}</pre>
       `;
-      const newDiv = document.createElement("div");
-      newDiv.innerHTML = rawResults;
-      results.appendChild(newDiv);
-    });
+    htmlTemplate.push(rawResults);
+    return htmlTemplate.join("");
+  }
+
+  return `<p>data not available</p>`;
 }
 
-const getData = async (url = "") => {
-  const res = await fetch(url);
+const postData = async (url = "", data = {}) => {
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
   try {
     const data = await res.json();
     return data;
@@ -93,4 +114,4 @@ const getData = async (url = "") => {
   }
 };
 
-export { handleSubmit };
+export { handleSubmit, renderResults, resultsTemplate };

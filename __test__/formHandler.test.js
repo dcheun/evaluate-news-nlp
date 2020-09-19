@@ -1,22 +1,35 @@
-// Import the js file to test
-import { handleSubmit } from "../src/client/js/formHandler";
+import { resultsTemplate } from "../src/client/js/formHandler";
 
-// The describe function takes two arguments - a string description,
-// and a test suite as a callback function.
-// A test suite may contain one or more related tests.
-describe("Testing the submit functionality", () => {
-  // The test() function has two args - a string description, and
-  // an actual test as a callback function.
-  test("Testing the handleSubmit() function", () => {
-    // Define the input for the functionality, if any,
-    // in the form of variables/array.
-    // Define the expected output, if any, in the form of
-    // variables/array.
-    // The expect() function, in combination with a Jest matcher,
-    // is used to check if the function produces the expected output
-    // The general syntax is
-    // `expect(myFunction(arg1, arg2, ...)).toEqual(expectedValue);`,
-    // where `toEqual()` is a matcher.
-    expect(handleSubmit).toBeDefined();
+describe("Testing API calls functionality", () => {
+  test("Adding API response with correct data", () => {
+    let mockResponse = {
+      status: {
+        code: "0",
+        msg: "OK",
+        credits: "3",
+        remaining_credits: "19951",
+      },
+      model: "general_en",
+      score_tag: "N",
+      agreement: "DISAGREEMENT",
+      subjectivity: "SUBJECTIVE",
+      confidence: "86",
+      irony: "NONIRONIC",
+      sentence_list: [],
+      sentimented_entity_list: [],
+      sentimented_concept_list: [],
+    };
+    expect(resultsTemplate(mockResponse)).toMatch(
+      /<td>Global<\/td>\s*<td>general_en<\/td>\s*<td>N<\/td>\s*<td>DISAGREEMENT<\/td>\s*<td>SUBJECTIVE<\/td>\s*<td>86<\/td>\s*<td>NONIRONIC<\/td>/
+    );
+  });
+  test("Adding API response operation denied error", () => {
+    let mockResponse = {
+      status: { code: "100", msg: "Operation denied", credits: "0" },
+    };
+    expect(resultsTemplate(mockResponse)).toBe("<p>data not available</p>");
+  });
+  test("Adding API response with null response", () => {
+    expect(resultsTemplate(null)).toBe("<p>data not available</p>");
   });
 });
